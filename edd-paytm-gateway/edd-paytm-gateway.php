@@ -160,7 +160,7 @@ function edd_process_paytm_gateway_ipn() {
 						//  code by paytm team
                 $bool = "FALSE";
                 $secret_key = $edd_options['paytm_mer_access_key'];
-                bool = verifychecksum_e($paramList, $secret_key, $checksum_recv);
+                $bool = verifychecksum_e($paramList, $secret_key, $checksum_recv);
                 
                 if ($bool == "TRUE") {	         
                     $payment_meta   = edd_get_payment_meta( $payment_id );
