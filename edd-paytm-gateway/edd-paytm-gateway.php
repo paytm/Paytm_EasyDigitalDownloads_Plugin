@@ -140,7 +140,6 @@ function edd_process_paytm_gateway_ipn() {
         $payment_id = $_GET['payment_id'];
         
         if(empty($payment_id)){
-            echo "hi";
             edd_send_back_to_checkout( '?payment-mode=paytm_gateway' );            
         }
 	
@@ -161,10 +160,7 @@ function edd_process_paytm_gateway_ipn() {
 						//  code by paytm team
                 $bool = "FALSE";
                 $secret_key = $edd_options['paytm_mer_access_key'];
-                echo $secret_key.'  sec'.$checksum_recv.'-checksum<pre>';
-                print_r($paramList);
-                $bool = verifychecksum_e($paramList, $secret_key, $checksum_recv);
-                echo $bool;
+                bool = verifychecksum_e($paramList, $secret_key, $checksum_recv);
                 
                 if ($bool == "TRUE") {	         
                     $payment_meta   = edd_get_payment_meta( $payment_id );
