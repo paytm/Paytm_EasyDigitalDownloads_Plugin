@@ -82,7 +82,6 @@ function pw_edd_process_payment( $purchase_data ) {
 		$payment = edd_insert_payment( $payment );
 
 		$merchant_payment_confirmed = false;
-
                 $secret_key = $edd_options['paytm_mer_access_key'];
                 $params = 	array(
                                 'REQUEST_TYPE' => 'DEFAULT',
@@ -94,9 +93,12 @@ function pw_edd_process_payment( $purchase_data ) {
                                 'CUST_ID' => $purchase_data['user_email'],
                                 'ORDER_ID'=> $purchase_data['purchase_key'],
                                 'EMAIL'=> $purchase_data['user_email'],
-                                'CALLBACK_URL'=> get_site_url().'/?edd-listener=PAYTM_IPN&payment_id='.$payment,
+                                
                                  );
-                
+                if($edd_options['paytm_callback']=='1')
+				{
+					$params['CALLBACK_URL']= get_site_url().'/?edd-listener=PAYTM_IPN&payment_id='.$payment;
+				}
 
                 $checksum = getChecksumFromArray($params, $secret_key);
                 $params['CHECKSUMHASH'] =  $checksum;
@@ -249,6 +251,12 @@ function pw_edd_add_settings( $settings ) {
 				'desc' => __( 'Industry Type Parameter Provided By Paytm (Retail,Entertainment etc.)', 'pw_edd' ),
 				'type' => 'text',
 				'size' => 'regular',
+			),
+			'paytm_callback' => array(
+				'id'   => 'paytm_callback',
+				'name' => __( 'Enable CallBack Url', 'pw_edd' ),
+				'desc' => __( 'Set to enable callback url', 'pw_edd' ),
+				'type' => 'checkbox',				
 			),
 		);
 	return array_merge( $settings, $paytm_gateway_settings );
