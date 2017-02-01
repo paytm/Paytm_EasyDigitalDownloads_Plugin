@@ -164,21 +164,41 @@ function edd_process_paytm_gateway_ipn() {
                 $secret_key = $edd_options['paytm_mer_access_key'];
                 $bool = verifychecksum_e($paramList, $secret_key, $checksum_recv);
                 
-                if ($bool == "TRUE") {	         
-                    $payment_meta   = edd_get_payment_meta( $payment_id );
-                    
-                    
-                    
-                    edd_insert_payment_note( $payment_id, sprintf( __( 'Thank you for your order . Your transaction has been successful. Paytm Transaction ID: %s', 'edd' ) , $_REQUEST['TXNID'] ) );
-                    edd_set_payment_transaction_id( $payment_id, $_REQUEST['TXNID'] );
-                    edd_update_payment_status( $payment_id, 'complete' );
-                    edd_empty_cart();
-                    edd_send_to_success_page();
+                if ($bool == "TRUE") {	   
+					
+					// Create an array having all required parameters for status query.
+					$requestParamList = array("MID" => $edd_options['paytm_merchant_id'] , "ORDERID" => $order_sent);
+					
+					// Call the PG's getTxnStatus() function for verifying the transaction status.
+					if($edd_options['paytm_select_mode'] == '1')
+					{
+						$check_status_url = 'https://secure.paytm.in/oltp/HANDLER_INTERNAL/TXNSTATUS';
+					}
+					else
+					{
+						$check_status_url = 'https://pguat.paytm.com/oltp/HANDLER_INTERNAL/TXNSTATUS';
+					}
+					$responseParamList = callAPI($check_status_url, $requestParamList);	
+					if($responseParamList['STATUS']=='TXN_SUCCESS' && $responseParamList['TXNAMOUNT']==$_POST['TXNAMOUNT'])
+					{
+						$payment_meta   = edd_get_payment_meta( $payment_id );
+						edd_insert_payment_note( $payment_id, sprintf( __( 'Thank you for your order . Your transaction has been successful. Paytm Transaction ID: %s', 'edd' ) , $_REQUEST['TXNID'] ) );
+						edd_set_payment_transaction_id( $payment_id, $_REQUEST['TXNID'] );
+						edd_update_payment_status( $payment_id, 'complete' );
+						edd_empty_cart();
+						edd_send_to_success_page();
+					}
+					else{
+						edd_record_gateway_error( __( 'Paytm Error', 'edd' ), sprintf( __( 'Transaction Failed, No Response ', 'edd' ), '' ), $payment_id );
+						edd_update_payment_status( $payment_id, 'failed' );
+						edd_insert_payment_note( $payment_id, sprintf( __( 'Transaction Failed, No Response ', 'edd' ), '' ) );
+						wp_redirect( '?page_id=6&payment-mode=paytm_gateway' );
+					}
                    					
                 }else{ 
                         edd_record_gateway_error( __( 'Paytm Error', 'edd' ), sprintf( __( 'Transaction Failed Invalid Checksum', 'edd' ), '' ), $payment_id );
-			edd_update_payment_status( $payment_id, 'failed' );
-			edd_insert_payment_note( $payment_id, sprintf( __( 'Transaction Failed Invalid Checksum', 'edd' ), '' ) );
+						edd_update_payment_status( $payment_id, 'failed' );
+						edd_insert_payment_note( $payment_id, sprintf( __( 'Transaction Failed Invalid Checksum', 'edd' ), '' ) );
                         wp_redirect( '?page_id=6&payment-mode=paytm_gateway' );
                         //edd_send_back_to_checkout( '?payment-mode=paytm_gateway' );
                     }
