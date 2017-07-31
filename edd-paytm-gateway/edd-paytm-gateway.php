@@ -193,9 +193,9 @@ function edd_process_paytm_gateway_ipn() {
 						edd_send_to_success_page();
 					}
 					else{
-						edd_record_gateway_error( __( 'Paytm Error', 'edd' ), sprintf( __( 'Transaction Failed, No Response ', 'edd' ), '' ), $payment_id );
+						edd_record_gateway_error( __( 'Paytm Error', 'edd' ), sprintf( __( 'It seems some issue in server to server communication. Kindly connect with administrator.', 'edd' ), '' ), $payment_id );
 						edd_update_payment_status( $payment_id, 'failed' );
-						edd_insert_payment_note( $payment_id, sprintf( __( 'Transaction Failed, No Response ', 'edd' ), '' ) );
+						edd_insert_payment_note( $payment_id, sprintf( __( 'It seems some issue in server to server communication. Kindly connect with administrator.', 'edd' ), '' ) );
 						wp_redirect( '?page_id=6&payment-mode=paytm_gateway' );
 					}
                    					
