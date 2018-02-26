@@ -37,20 +37,28 @@ function pw_edd_process_payment( $purchase_data ) {
 	/**********************************
 	* set transaction mode
 	**********************************/
-
-	if ( edd_is_test_mode() ) {
-
-			$paytm_redirect = 'https://pguat.paytm.com/oltp-web/processTransaction?';
-
+	/*	19751/17Jan2018	*/
+		/*if ( edd_is_test_mode() ) {
+			$paytm_redirect = 'https://pguat.paytm.com/oltp-web/processTransaction?'; 
 		} else {
-
 			if($edd_options['paytm_select_mode'] == '1'){
-				$paytm_redirect = 'https://secure.paytm.in/oltp-web/processTransaction?';
+				$paytm_redirect = 'https://secure.paytm.in/oltp-web/processTransaction?'; 
 			}else{
-				$paytm_redirect = 'https://pguat.paytm.com/oltp-web/processTransaction?';
-			}
+				$paytm_redirect = 'https://pguat.paytm.com/oltp-web/processTransaction?'; 
+			} 
+		}*/
 
-		}
+		/*if ( edd_is_test_mode() ) {
+			$paytm_redirect = 'https://securegw-stage.paytm.in/theia/processTransaction?'; 
+		} else {
+			if($edd_options['paytm_select_mode'] == '1'){
+				$paytm_redirect = 'https://securegw.paytm.in/theia/processTransaction?'; 
+			}else{
+				$paytm_redirect = 'https://securegw-stage.paytm.in/theia/processTransaction?'; 
+			} 
+		}*/
+		$paytm_redirect = $edd_options['paytm_transaction_url']."?"; 
+	/*	19751/17Jan2018 end	*/
 
 
 	// check for any stored errors
@@ -174,14 +182,20 @@ function edd_process_paytm_gateway_ipn() {
 					$requestParamList['CHECKSUMHASH'] = $StatusCheckSum;
 					
 					// Call the PG's getTxnStatus() function for verifying the transaction status.
-					if($edd_options['paytm_select_mode'] == '1')
-					{
-						$check_status_url = 'https://secure.paytm.in/oltp/HANDLER_INTERNAL/getTxnStatus';
-					}
-					else
-					{
-						$check_status_url = 'https://pguat.paytm.com/oltp/HANDLER_INTERNAL/getTxnStatus';
-					}
+					/*	19751/17Jan2018	*/	
+						/*if($edd_options['paytm_select_mode'] == '1') {
+							$check_status_url = 'https://secure.paytm.in/oltp/HANDLER_INTERNAL/getTxnStatus';
+						} else {
+							$check_status_url = 'https://pguat.paytm.com/oltp/HANDLER_INTERNAL/getTxnStatus';
+						}*/
+
+						/*if($edd_options['paytm_select_mode'] == '1') {
+							$check_status_url = 'https://securegw.paytm.in/merchant-status/getTxnStatus';
+						} else {
+							$check_status_url = 'https://securegw-stage.paytm.in/merchant-status/getTxnStatus';
+						}*/
+						$check_status_url = $edd_options['paytm_transaction_status_url'];
+					/*	19751/17Jan2018 end	*/	
 					$responseParamList = callNewAPI($check_status_url, $requestParamList);	
 					if($responseParamList['STATUS']=='TXN_SUCCESS' && $responseParamList['TXNAMOUNT']==$_POST['TXNAMOUNT'])
 					{
@@ -255,21 +269,35 @@ function pw_edd_add_settings( $settings ) {
 				'type' => 'text',
 				'size' => 'regular',
 			),
-			'paytm_select_mode' => array(
+			'paytm_transaction_url' => array(
+				'id'   => 'paytm_transaction_url',
+				'name' => __( 'Transaction URL', 'pw_edd' ),
+				'desc' => __( 'Transaction URL Provided By Paytm', 'pw_edd' ),
+				'type' => 'text',
+				'size' => 'regular',
+			),
+			'paytm_transaction_status_url' => array(
+				'id'   => 'paytm_transaction_status_url',
+				'name' => __( 'Transaction Status URL', 'pw_edd' ),
+				'desc' => __( 'Transaction URL Provided By Paytm', 'pw_edd' ),
+				'type' => 'text',
+				'size' => 'regular',
+			),
+			/*'paytm_select_mode' => array(
 				'id'   => 'paytm_select_mode',
 				'name' => __( 'Select Mode', 'pw_edd' ),
 				'desc' => __( '0 for stagging, 1 for Production', 'pw_edd' ),
 				'type' => 'text',
 				'size' => 'regular',
-			),
-                        'paytm_website_name' => array(
+			),*/
+            'paytm_website_name' => array(
 				'id'   => 'paytm_website_name',
 				'name' => __( 'Website Name', 'pw_edd' ),
 				'desc' => __( 'Website Parameter Provided By Paytm', 'pw_edd' ),
 				'type' => 'text',
 				'size' => 'regular',
 			),
-                        'paytm_industry_type' => array(
+            'paytm_industry_type' => array(
 				'id'   => 'paytm_industry_type',
 				'name' => __( 'Industry Type', 'edd' ),
 				'desc' => __( 'Industry Type Parameter Provided By Paytm (Retail,Entertainment etc.)', 'pw_edd' ),
