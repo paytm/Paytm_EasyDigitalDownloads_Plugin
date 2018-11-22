@@ -8,6 +8,8 @@
  3. Fill in the necessary details for Merchant Id, Merchant Key, Select Mode, Website Name and Industry Type.
  4. Save the data.
 
+ See Video : https://www.youtube.com/watch?v=scRNFL9bilQ
+
 # Paytm PG URL Details
 	staging	
 		Transaction URL             => https://securegw-stage.paytm.in/theia/processTransaction
