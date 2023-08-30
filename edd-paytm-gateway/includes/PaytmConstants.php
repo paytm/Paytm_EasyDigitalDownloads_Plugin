@@ -23,8 +23,8 @@ class PaytmConstants{
 	CONST CONNECT_TIMEOUT						= 10;
 	CONST TIMEOUT								= 10;
 
-	CONST LAST_UPDATED							= "20191005";
-	CONST PLUGIN_VERSION						= "2.0";
+	CONST LAST_UPDATED							= "20230830";
+	CONST PLUGIN_VERSION						= "2.1";
 
 	CONST CUSTOM_CALLBACK_URL					= "http://localhost/platform/wordpress/woocommerce/";
 
