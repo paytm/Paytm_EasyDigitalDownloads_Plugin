@@ -1,11 +1,11 @@
 <?php
 /*
 Plugin Name: Easy Digital Downloads - Paytm Gateway
-Plugin URL: http://easydigitaldownloads.com/extension/paytm-gateway
+Plugin URL: https://www.paytmpayments.com/docs/plugins/
 Description: A paytm gateway for Easy Digital Downloads
-Version: 1.0
+Version: 2.0
 Author: Paytm
-Author URI: https://developer.paytm.com/docs/
+Author URI: https://www.paytmpayments.com/docs/plugins/
 Contributors: Paytm
 */
 
@@ -318,12 +318,15 @@ function edd_process_paytm_gateway_ipn() {
 add_action( 'edd_verify_paytm_gateway_ipn', 'edd_process_paytm_gateway_ipn' );
 
 
-
+function edd_register_paytm_gateway_section( $sections ) {
+    $sections['paytm_gateway'] = 'Paytm';
+    return $sections;
+}
+add_filter( 'edd_settings_sections_gateways', 'edd_register_paytm_gateway_section' ); 
 
 // adds the settings to the Payment Gateways section
 function pw_edd_add_settings( $settings ) {
-
-	$paytm_gateway_settings = array(
+	$paytm_gateway_settings['paytm_gateway'] = array(
 			'paytm' => array(
 				'id'   => 'paytm',
 				'name' => '<strong>' . __('Login & Pay with Paytm Settings', 'pw_edd') . '</strong>',
@@ -344,7 +347,7 @@ function pw_edd_add_settings( $settings ) {
 				'type' => 'text',
 				'size' => 'regular',
 			),
-			'paytm_transaction_url' => array(
+			/* 'paytm_transaction_url' => array(
 				'id'   => 'paytm_transaction_url',
 				'name' => __( 'Transaction URL', 'pw_edd' ),
 				'desc' => __( 'Transaction URL Provided By Paytm', 'pw_edd' ),
@@ -357,12 +360,13 @@ function pw_edd_add_settings( $settings ) {
 				'desc' => __( 'Transaction URL Provided By Paytm', 'pw_edd' ),
 				'type' => 'text',
 				'size' => 'regular',
-			),
+			), */
 			'paytm_select_mode' => array(
 				'id'   => 'paytm_select_mode',
-				'name' => __( 'Select Mode', 'pw_edd' ),
-				'desc' => __( '0 for stagging, 1 for Production', 'pw_edd' ),
-				'type' => 'text',
+				'name' => __( 'Environment', 'pw_edd' ),
+				'desc' => __( '', 'pw_edd' ),
+				'type' => 'select',
+				'options'		=> array("0" => "Test/Staging", "1" => "Production"),
 				'size' => 'regular',
 			),
             'paytm_website_name' => array(
@@ -372,7 +376,7 @@ function pw_edd_add_settings( $settings ) {
 				'type' => 'text',
 				'size' => 'regular',
 			),
-            'paytm_industry_type' => array(
+            /* 'paytm_industry_type' => array(
 				'id'   => 'paytm_industry_type',
 				'name' => __( 'Industry Type', 'edd' ),
 				'desc' => __( 'Industry Type Parameter Provided By Paytm (Retail,Entertainment etc.)', 'pw_edd' ),
@@ -384,8 +388,14 @@ function pw_edd_add_settings( $settings ) {
 				'name' => __( 'Enable CallBack Url', 'pw_edd' ),
 				'desc' => __( 'Set to enable callback url', 'pw_edd' ),
 				'type' => 'checkbox',				
-			),
+			), */
 		);
-	return array_merge( $settings, $paytm_gateway_settings );
+		$current_section = isset( $_GET['section'] ) ? $_GET['section'] : '';
+	
+	if ( 'paytm_gateway' == $current_section ) {
+		
+     $settings = array_merge( $settings, $paytm_gateway_settings );
+    }
+	return $settings;
 }
 add_filter( 'edd_settings_gateways', 'pw_edd_add_settings' );
